@@ -7,5 +7,11 @@ export const routes: Routes = [
             import('./features/student-dashboard/student-dashboard').then(m => m.StudentDashboard)
     },
 
+    {
+
+        path: 'courses/:id',
+        loadComponent: ()=> import('./features/course-detail/course-detail').then(m=>m.CourseDetail)
+    },
+
     { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
 ];
