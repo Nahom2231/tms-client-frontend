@@ -3,4 +3,7 @@
   <p>Credits Earned: <strong>{{earnedCredits()}}</strong></p>
   <p>Graduation Status: <strong>{{graduationStatus()}}</strong></p>
   <button (click)="registerForClass()">Register for a class (+3 credits)</button>
+  <tms-course-card
+  [course]="sampleCourse"
+  (enrollClicked)="handleEnroll($event)"></tms-course-card>
 </div>
