@@ -12,7 +12,7 @@ export class StudentDashboard {
 
   graduationStatus= computed(() =>
 
-    this.earnedCredits() >=120 ? "ELigible for GRaduation " : "In Progress"
+    this.earnedCredits() >=120 ? "ELigible for Graduation" : "In Progress"
 );
 
 registerForClass() {
