@@ -3,6 +3,7 @@ import {RouterLink} from '@angular/router';
 
 @Component({
   selector: 'app-course-detail',
+  standalone: true,
   imports: [RouterLink],
   templateUrl: './course-detail.html',
   styleUrl: './course-detail.scss',
