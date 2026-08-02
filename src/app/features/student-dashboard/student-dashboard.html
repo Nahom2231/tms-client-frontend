@@ -20,3 +20,22 @@
         Last enrollment request: {{picked.title }} ({{ picked.code}})
     </p>
   }
+  @if (coursesResource.isLoading()){
+    <p> Loading courses...</p>
+  } @else if (coursesResource.value(); as courses){
+    @if(courses.length===0){
+        <p>No courses are available this term. Check back duriing registration.</p>
+
+    } @else {
+        <div class="course-grid">
+            @for (course of courses; track course.id){
+                <tms-course-card
+                [course]="course"
+                (enrollClicked)="handleEnroll($event)">
+            </tms-course-card>
+            }@empty{
+                <p> No results match your search</p>
+            }
+        </div>
+    }
+  }

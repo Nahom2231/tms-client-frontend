@@ -1,6 +1,8 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component,inject, signal, computed } from '@angular/core';
 import { CourseCard } from '../../ui/course-card/course-card';
-import {Course} from '../../models/course.model';
+import {Course, PagedResponse} from '../../models/course.model';
+import { CourseService } from "../../services/course";
+import {rxResource} from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-student-dashboard',
@@ -10,6 +12,7 @@ import {Course} from '../../models/course.model';
   styleUrl: './student-dashboard.scss',
 })
 export class StudentDashboard {
+  private api= inject(CourseService);
   studentName =signal("Liya kebede");
   earnedCredits = signal(45);
 
@@ -17,6 +20,11 @@ export class StudentDashboard {
 
     this.earnedCredits() >=120 ? "ELigible for Graduation" : "In Progress"
 );
+
+coursesResource = rxResource({
+  stream: () => this.api.getAll(),
+});
+
 
 registerForClass() {
   this.earnedCredits.update((c) => c + 3);
