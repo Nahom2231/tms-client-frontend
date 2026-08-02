@@ -1,0 +1,93 @@
+<h2>Course Enrollment</h2>
+@if (submitted()){
+    <div class = "alert alert-success">
+        Enrollment submitted. Check the console for the payload.
+    </div>
+}@else {
+    <form [formGroup]=" form" (ngSubmit)="submit()">
+
+    <div class="form group mb-3">
+        <label for="studentId">Student ID</label>
+        <input
+        id="studentId"
+        type="text"
+        formControlName="studentId"
+        class="form-control"
+    />
+    @if (form.controls.studentId.touched && form.controls.studentId.invalid){
+        <small class="text-danger">Enter a valid Student ID (format: STU-0000)</small>
+
+    }
+    </div>
+
+    <div class="form group mb-3">
+        <label for="courseId">Course ID</label>
+        <input
+        id="courseId"
+        type="text"
+        formControlName="courseId"
+        class="form-control"
+        />
+        @if (form.controls.courseId.touched && form.controls.courseId.invalid){
+            <small class="text-danger">Course ID is required</small>
+        }
+    </div>
+
+    <div class="form-group mb-3">
+        <label for ="term">Term</label>
+        <input
+            id="term"
+            type="text"
+            formControlName="term"
+            class="form-control"
+        />
+        </div>
+       <div class="form-group mb-3">
+        <label for="notes">Notes (optional)</label>
+        <textarea
+            id="notes"
+            formControlName="notes"
+            class="form-control">
+        </textarea>
+
+       </div>
+
+       <div class="mb-3">
+        <h3>Backup Courses</h3>
+        <div formArrayName="backupCourses">
+            @for(backup of backups.controls; track $index){
+                <div class="d-flex mb-2 align-items-center">
+                    <input
+                    [formControlName]="$index"
+                    class="form-control me-2"
+                    placeholder="Backup Course Code"
+                    />
+                <button
+                type="button"
+                class="btn btn-danger btn-sm"
+                (click)="removeBackup($index)">
+                    Remove
+                </button>
+                </div>
+                @if (backup.touched && backup.invalid) {
+         <small class="text-danger d-block mb-2">Backup course code is required.</small>
+  }
+
+            }
+        </div>
+        <button
+        type="button"
+        class="btn btn-secondary btn-sm mt-2"
+        (click)="addBackup()">
+            Add Backup Course
+        </button>
+       </div>
+
+       <button type="submit" class="btn btn-primary">Confirm Enrollment</button> 
+       </form>
+        
+    
+}
+
+
+
