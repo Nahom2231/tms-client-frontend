@@ -1,59 +1,61 @@
-# TmsClient
+This session focuses on solving state drift in Angular applications. State drift happens when multiple components independently fetch and manage their own copies of shared data, leading to inconsistencies. The solution is to use a centralized store (NgRx SignalStore) as a single source of truth, ensuring all components stay in sync automatically.
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.0.8.
+📌 General Explanation
+Problem: Local signals (signal()) are isolated. If two components each fetch enrollment data separately, they hold separate copies. Updates in one component don’t reflect in the other.
 
-## Development server
+Solution: Use a singleton store with NgRx SignalStore. All components inject the same store, so when data changes, every component updates instantly without refresh or duplicate API calls.
 
-To start a local development server, run:
+Benefit: Eliminates drift, reduces redundant API calls, and ensures consistent UI state across the app.
 
-```bash
-ng serve
-```
+🔎 Specific Explanation
+Prerequisites
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Define an Enrollment model (enrollment.model.ts).
 
-## Code scaffolding
+Build an Enrollment service (enrollment.service.ts) to interact with the API.
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+Why Local Signals Drift
 
-```bash
-ng generate component component-name
-```
+Each signal() call creates an independent reactive container.
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Fine for local UI state (like toggles), but not for shared mutable data.
 
-```bash
-ng generate --help
-```
+Install NgRx SignalStore
 
-## Building
+npm install @ngrx/signals
 
-To build the project run:
+Build the Enrollment Store
 
-```bash
-ng build
-```
+Use signalStore with:
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+withState: adds simple properties (loading, error).
 
-## Running unit tests
+withEntities: manages enrollment records efficiently.
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+withComputed: creates derived signals (e.g., pendingCount).
 
-```bash
-ng test
-```
+withMethods: defines store methods like loadEnrollments and approveEnrollment.
 
-## Running end-to-end tests
+Key Techniques:
 
-For end-to-end (e2e) testing, run:
+concatMap ensures ordered API calls.
 
-```bash
-ng e2e
-```
+Optimistic updates: UI updates instantly before server confirmation, with rollback if the server rejects.
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+Wire Store into Components
 
-## Additional Resources
+Inject EnrollmentStore into components.
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Bind templates directly to store signals (store.entities(), store.pendingCount()).
+
+Result
+
+Approving an enrollment updates both the list and dashboard summary instantly.
+
+No refresh, no duplicate API calls, no drift.
+
+Next Steps
+
+Future sessions will cover performance optimization, defensive RxJS, and real-time sync with SignalR.
+
+✅ In short: This lab teaches you how to replace scattered local signals with a centralized SignalStore, ensuring consistent, reactive state management across multiple Angular components.
