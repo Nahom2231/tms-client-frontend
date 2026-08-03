@@ -1,0 +1,22 @@
+@if (store.isLoading()){
+    <p>Loading enrollments...</p>
+}
+<ul>
+    @for (enrollment of store.entities(); track enrollment.Id){
+        <li>
+            {{ enrollment.studentName }} - {{ enrollment.courseName }} (<strong > {{enrollment.status}}</strong>)
+            @if (enrollment.status === 'Pending'){
+               <button (click)="onApprove(enrollment.Id)">Approve</button>
+
+            }
+        </li>
+    }
+
+@if (store.error()) {
+    <p class=" error"> {{ store.error() }}</p>
+}
+<div>
+Total Pending: {{ store.pendingCount() }}
+
+</div>
+</ul>
