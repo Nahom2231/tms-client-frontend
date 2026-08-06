@@ -1,22 +1,44 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, viewChild, effect, inject,  } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { EnrollmentStore } from '../../store/enrollment.store';
+import {MatTableModule, MatTableDataSource} from '@angular/material/table';
+import {MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
+import { MatSortModule, MatSort } from '@angular/material/sort';
+import {MatButtonModule} from '@angular/material/button';
+import {Enrollment } from '../../models/enrollment.model';
+
 
 @Component({
   selector: 'app-enrollment-list',
-  imports: [],
+  standalone: true,
+  imports: [MatTableModule, MatPaginatorModule, MatSortModule, MatButtonModule ],
   templateUrl: './enrollment-list.html',
   styleUrl: './enrollment-list.scss',
 })
-export class EnrollmentList implements OnInit 
+export class EnrollmentList 
 {
   store = inject(EnrollmentStore);
+  displayedColumns: string[] =['studentName', 'courseName', 'status', 'actions'];
 
-  ngOnInit() {
-    this.store.loadEnrollments();
+  dataSource = new MatTableDataSource<Enrollment>();
+
+  readonly paginator = viewChild.required(MatPaginator);
+  readonly sort = viewChild.required(MatSort);
+  constructor() {
+    effect(() => {
+      this.dataSource.data = this.store.entities();
+
+    });
+    effect(() => {
+      this.dataSource.paginator = this.paginator();
+      this.dataSource.sort = this.sort();
+    });
   }
-  onApprove(id: string) {
+
+  approve(id: string) {
+    if(this.store.approveEnrollment){
     this.store.approveEnrollment(id);
   }
 
-}
+    }
+  }

@@ -11,6 +11,11 @@ export const routes: Routes = [
         loadComponent: ()=>
         import('./features/instructor-dashboard/instructor-dashboard').then(m=>m.InstructorDashboard)
     },
+    {   
+        path: 'enrollments',
+        loadComponent: ()=>
+            import('./features/enrollment-list/enrollment-list').then(m=>m.EnrollmentList)
+    },
 
     {
 
