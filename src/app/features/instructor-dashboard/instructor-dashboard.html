@@ -1,0 +1,24 @@
+<header>
+    <h1> Instructor Command Center</h1>
+    <p>Pending Approvals: <strong> {{store.pendingCount() }}</strong></p>
+</header>
+
+<main style="margin-top: 2rem;"></main>
+
+<section style="margin-top: 50vh;">
+    @defer(on viewport; prefetch on idle(500)) {
+        <app-analytics-chart/>
+    } @placeholder {
+        <div style ="padding: 1rem; background: #eee;">
+            Scroll down to view analytics...
+        </div>
+    } @loading (minimum 500ms) {
+        <div style ="padding : 1rem; background: #e0f7fa;">
+            Downloading chart engine...
+        </div>
+    }@error {
+        <div style="padding: 1rem; background: #ffebee; color: red;">
+            Failed to load chart. Check your connection.
+        </div>
+    }
+</section>
