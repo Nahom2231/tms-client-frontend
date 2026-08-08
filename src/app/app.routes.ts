@@ -28,5 +28,12 @@ export const routes: Routes = [
         loadComponent: () => import('./features/enrollment-form/enrollment-form').then(m => m.EnrollmentForm)
     },
 
+    {
+         path: 'grade-submission',
+         loadComponent: ()=>
+         import('./features/grade-submission/grade-submission.component')
+         .then(m=> m.GradeSubmissionComponent)
+    },
+
     { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
 ];
