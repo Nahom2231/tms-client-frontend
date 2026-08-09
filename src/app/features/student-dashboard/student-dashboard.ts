@@ -1,9 +1,9 @@
-import { Component,inject, signal, computed } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CourseCard } from '../../ui/course-card/course-card';
 import {Course, PagedResponse} from '../../models/course.model';
 import { CourseService } from "../../services/course";
 import {rxResource} from '@angular/core/rxjs-interop';
-
+import { EnrollmentStore } from '../../store/enrollment.store';
 @Component({
   selector: 'app-student-dashboard',
   standalone:true,
@@ -11,8 +11,9 @@ import {rxResource} from '@angular/core/rxjs-interop';
   templateUrl: './student-dashboard.html',
   styleUrl: './student-dashboard.scss',
 })
-export class StudentDashboard {
+export class StudentDashboard implements OnInit {
   private api= inject(CourseService);
+  readonly store = inject(EnrollmentStore);
   studentName =signal("Liya kebede");
   earnedCredits = signal(45);
 
@@ -24,8 +25,10 @@ export class StudentDashboard {
 coursesResource = rxResource({
   stream: () => this.api.getAll(),
 });
-
-
+ngOnInit()
+{
+  this.store.listenForLiveUpdates();
+}
 registerForClass() {
   this.earnedCredits.update((c) => c + 3);
 }

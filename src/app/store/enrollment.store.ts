@@ -1,22 +1,39 @@
+import { LiveSyncService } from './../services/live-sync';
 import { inject, computed } from '@angular/core';
 import { EnrollmentService } from '../services/enrollment.service';
 import { Enrollment } from '../models/enrollment.model';
-import { tap, concatMap, catchError, EMPTY } from 'rxjs';
+import { tap, concatMap, catchError, EMPTY,switchMap, pipe } from 'rxjs';
 import { signalStore, withState, withComputed, patchState, withMethods } from '@ngrx/signals';
+import { rxMethod} from '@ngrx/signals/rxjs-interop';
 
 export const EnrollmentStore = signalStore(
   { providedIn: 'root' },
   withState({
     isLoading: false,
     error: null as string | null,
-    entities: [] as Enrollment[],
+    entities: [{ Id: '101', studentName: 'Dawit Alemayehu', courseTitle: 'Advanced Java Services', status: 'Pending' },
+      { Id: '102', studentName: 'Abebe Kebede', courseTitle: 'Database Design', status: 'Pending' }] as unknown as Enrollment[],
   }),
   withComputed((store) => ({
     pendingCount: computed(
       () => store.entities().filter((e) => e.status === 'Pending').length
     ),
   })),
-  withMethods((store, api = inject(EnrollmentService)) => ({
+  withMethods((store, api = inject(EnrollmentService),
+      sync= inject(LiveSyncService)) => ({
+      listenForLiveUpdates: rxMethod<void>(
+      pipe(
+      tap(()=>sync.connect()),
+      switchMap(()=> sync.events$),
+       tap(event => {
+      patchState(store, {
+       entities: store.entities().map( e=>
+        e.Id === event.id ? { ...e, status: event.status } : e
+          )
+           });
+          })
+           )
+         ),
     loadEnrollments(): void {
       patchState(store, { isLoading: true, error: null });
       api.getAll()
@@ -33,10 +50,11 @@ export const EnrollmentStore = signalStore(
     approveEnrollment(id: string): void {
       patchState(store, {
         entities: store.entities().map((e) =>
-          e.Id === id ? { ...e, status: 'Approved' } : e
+         e.Id === id ? { ...e, status: 'Approved' } : e
         ),
       });
-      api.approve(id)
+       sync.emitLocalUpdate(id, 'Approved');
+      /*api.approve(id)
         .pipe(
           catchError(() => {
             patchState(store, {
@@ -48,7 +66,7 @@ export const EnrollmentStore = signalStore(
             return EMPTY;
           })
         )
-        .subscribe();
+        .subscribe();*/
     },
   }))
 );
