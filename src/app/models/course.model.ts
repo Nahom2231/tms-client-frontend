@@ -4,6 +4,7 @@ export interface Course{
     title: string;
     maxCapacity:number;
     enrollmentCount:number;
+    status?: string;
 }
 
 export interface PagedResponse<T> {
@@ -16,11 +17,3 @@ export interface PagedResponse<T> {
     hasNext: boolean;
 }
 
-export interface CourseLink {
-    href:string;
-    rel: string;
-    method: string;
-}
- export interface CourseDetail extends Course {
-    links:readonly CourseLink[];
- }
