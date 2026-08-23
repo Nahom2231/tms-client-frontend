@@ -1,0 +1,16 @@
+<div class="admin-course-container">
+  <h2>Course Management</h2>
+
+  @for (course of courses; track course.id) {
+    <div class="course-row">
+      <span>{{ course.title }}</span>
+
+      <!-- Step 3: Conditional UI check -->
+      @if (auth.hasRole('Admin')) {
+        <button (click)="deleteCourse(course.id)" class="btn btn-danger">
+          Delete Course
+        </button>
+      }
+    </div>
+  }
+</div>
