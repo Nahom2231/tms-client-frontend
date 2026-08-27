@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
-import { CourseCard } from '../../ui/course-card/course-card';
+import { CourseCardComponent } from '../../ui/course-card/course-card';
 import {Course, PagedResponse} from '../../models/course.model';
 import { CourseService } from "../../services/course";
 import {rxResource} from '@angular/core/rxjs-interop';
@@ -7,7 +7,7 @@ import { EnrollmentStore } from '../../store/enrollment.store';
 @Component({
   selector: 'app-student-dashboard',
   standalone:true,
-  imports: [CourseCard],
+  imports: [CourseCardComponent],
   templateUrl: './student-dashboard.html',
   styleUrl: './student-dashboard.scss',
 })

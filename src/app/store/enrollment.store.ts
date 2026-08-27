@@ -21,6 +21,9 @@ export const EnrollmentStore = signalStore(
   })),
   withMethods((store, api = inject(EnrollmentService),
       sync= inject(LiveSyncService)) => ({
+       seed(items: any[]) {
+      patchState(store, { entities: items });
+    }, 
       listenForLiveUpdates: rxMethod<void>(
       pipe(
       tap(()=>sync.connect()),
@@ -29,6 +32,7 @@ export const EnrollmentStore = signalStore(
       patchState(store, {
        entities: store.entities().map( e=>
         e.Id === event.id ? { ...e, status: event.status } : e
+
           )
            });
           })

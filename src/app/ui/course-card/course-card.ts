@@ -9,7 +9,7 @@ import {RouterLink } from '@angular/router';
   templateUrl: './course-card.html',
   styleUrl: './course-card.scss',
 })
-export class CourseCard {
+export class CourseCardComponent {
   course = input.required<Course>();
   enrollClicked = output<Course>();
 }
