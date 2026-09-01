@@ -1,24 +1,126 @@
-<header>
-    <h1> Instructor Command Center</h1>
-    <p>Pending Approvals: <strong> {{store.pendingCount() }}</strong></p>
-</header>
+<div class="container py-2">
+  
+  <!-- Header Title -->
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-4">
+    <div>
+      <h1 class="h3 mb-1">👨‍🏫 Instructor Command Center</h1>
+      <p class="text-muted small mb-0">Manage student course enrollments, track grading performance, and inspect system telemetry</p>
+    </div>
+    <div class="d-flex gap-2">
+      <a routerLink="/grade-submission" class="btn-tms-primary btn-sm">
+        📝 Enter Grades
+      </a>
+      <a routerLink="/enrollments" class="btn-tms-outline btn-sm">
+        📋 View All Requests
+      </a>
+    </div>
+  </div>
 
-<main style="margin-top: 2rem;"></main>
+  <!-- Key Metrics Stat Cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-12 col-sm-6 col-lg-3">
+      <div class="tms-card metric-card p-3">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="text-muted small fw-semibold text-uppercase">Pending Approvals</span>
+          <span class="fs-4">⏳</span>
+        </div>
+        <div class="h2 fw-bold mb-0 text-warning">{{ store.pendingCount() }}</div>
+        <small class="text-muted" style="font-size: 0.72rem;">Requires instructor signature</small>
+      </div>
+    </div>
 
-<section style="margin-top: 50vh;">
-    @defer(on viewport; prefetch on idle(500)) {
-        <app-analytics-chart/>
-    } @placeholder {
-        <div style ="padding: 1rem; background: #eee;">
-            Scroll down to view analytics...
+    <div class="col-12 col-sm-6 col-lg-3">
+      <div class="tms-card metric-card p-3">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="text-muted small fw-semibold text-uppercase">Approved Students</span>
+          <span class="fs-4">✅</span>
         </div>
-    } @loading (minimum 500ms) {
-        <div style ="padding : 1rem; background: #e0f7fa;">
-            Downloading chart engine...
+        <div class="h2 fw-bold mb-0 text-success">{{ store.approvedCount() }}</div>
+        <small class="text-muted" style="font-size: 0.72rem;">Active in courses</small>
+      </div>
+    </div>
+
+    <div class="col-12 col-sm-6 col-lg-3">
+      <div class="tms-card metric-card p-3">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="text-muted small fw-semibold text-uppercase">Total Requests</span>
+          <span class="fs-4">📊</span>
         </div>
-    }@error {
-        <div style="padding: 1rem; background: #ffebee; color: red;">
-            Failed to load chart. Check your connection.
+        <div class="h2 fw-bold mb-0 text-primary">{{ store.totalCount() }}</div>
+        <small class="text-muted" style="font-size: 0.72rem;">Lifetime applications</small>
+      </div>
+    </div>
+
+    <div class="col-12 col-sm-6 col-lg-3">
+      <div class="tms-card metric-card p-3">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="text-muted small fw-semibold text-uppercase">Class GPA Avg</span>
+          <span class="fs-4">🏆</span>
         </div>
-    }
-</section>
+        <div class="h2 fw-bold mb-0 text-info">3.82</div>
+        <small class="text-muted" style="font-size: 0.72rem;">Top 5% departmental score</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Action Pending Approvals Table -->
+  <div class="tms-card mb-4 p-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h2 class="h5 mb-0">⚡ Urgent Enrollment Approvals</h2>
+      <a routerLink="/enrollments" class="small text-decoration-none text-primary">View Full Table →</a>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table align-middle mb-0" style="color: var(--text-main);">
+        <thead>
+          <tr class="text-muted small border-bottom border-secondary border-opacity-25">
+            <th>STUDENT NAME</th>
+            <th>COURSE REQUESTED</th>
+            <th>DATE ENROLLED</th>
+            <th>STATUS</th>
+            <th class="text-end">ACTIONS</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of store.entities(); track item.Id || item.id || $index) {
+            @if (item.status === 'Pending') {
+              <tr class="border-bottom border-secondary border-opacity-10">
+                <td>
+                  <div class="fw-semibold">{{ item.studentName }}</div>
+                  <small class="text-muted">ID: {{ item.studentId || item.Id }}</small>
+                </td>
+                <td>
+                  <div>{{ item.courseName || item.courseTitle }}</div>
+                </td>
+                <td>
+                  <small class="text-muted">{{ item.enrolledAt || '2026-08-30' }}</small>
+                </td>
+                <td>
+                  <span class="tms-badge badge-pending">Pending</span>
+                </td>
+                <td class="text-end">
+                  <button (click)="approve(item.Id || item.id || '')" class="btn btn-sm btn-success me-2">
+                    Approve
+                  </button>
+                  <button (click)="reject(item.Id || item.id || '')" class="btn btn-sm btn-outline-danger">
+                    Reject
+                  </button>
+                </td>
+              </tr>
+            }
+          } @empty {
+            <tr>
+              <td colspan="5" class="text-center py-4 text-muted">No pending enrollment requests. All caught up!</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Analytics Section -->
+  <section class="mt-4">
+    <app-analytics-chart></app-analytics-chart>
+  </section>
+
+</div>
