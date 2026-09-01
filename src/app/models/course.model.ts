@@ -1,19 +1,22 @@
-export interface Course{
+export interface Course {
     id: number;
     code: string; 
     title: string;
-    maxCapacity:number;
-    enrollmentCount:number;
+    maxCapacity: number;
+    enrollmentCount: number;
     status?: string;
+    category?: string;
+    instructor?: string;
+    credits?: number;
+    description?: string;
 }
 
 export interface PagedResponse<T> {
     items: T[];
     totalCount: number;
-    page:number;
+    page: number;
     pageSize: number;
-    totalPages:number;
+    totalPages: number;
     hasPrevious: boolean;
     hasNext: boolean;
 }
-
