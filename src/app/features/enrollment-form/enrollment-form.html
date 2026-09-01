@@ -1,93 +1,139 @@
-<h2>Course Enrollment</h2>
-@if (submitted()){
-    <div class = "alert alert-success">
-        Enrollment submitted. Check the console for the payload.
+<div class="container py-2 max-w-lg mx-auto" style="max-width: 680px;">
+  
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="h3 mb-1">📝 Course Enrollment Application</h1>
+      <p class="text-muted small mb-0">Submit your registration details for academic review</p>
     </div>
-}@else {
-    <form [formGroup]=" form" (ngSubmit)="submit()">
+    <a routerLink="/dashboard" class="btn-tms-outline btn-sm">← Back to Catalog</a>
+  </div>
 
-    <div class="form group mb-3">
-        <label for="studentId">Student ID</label>
-        <input
-        id="studentId"
-        type="text"
-        formControlName="studentId"
-        class="form-control"
-    />
-    @if (form.controls.studentId.touched && form.controls.studentId.invalid){
-        <small class="text-danger">Enter a valid Student ID (format: STU-0000)</small>
-
-    }
+  @if (submitted()) {
+    <div class="tms-card p-5 text-center shadow-sm">
+      <div class="display-3 mb-3">🎉</div>
+      <h2 class="h3 text-success mb-2">Enrollment Submitted Successfully!</h2>
+      <p class="text-muted mb-4">
+        Your application has been logged into the Training Management System. An instructor will review and issue confirmation.
+      </p>
+      
+      <div class="d-flex justify-content-center gap-3">
+        <a routerLink="/enrollments" class="btn-tms-primary">
+          View My Enrollments Status
+        </a>
+        <button (click)="resetForm()" class="btn-tms-outline">
+          Submit Another Request
+        </button>
+      </div>
     </div>
+  } @else {
+    <div class="tms-card p-4">
+      <form [formGroup]="form" (ngSubmit)="submit()">
 
-    <div class="form group mb-3">
-        <label for="courseId">Course ID</label>
-        <input
-        id="courseId"
-        type="text"
-        formControlName="courseId"
-        class="form-control"
-        />
-        @if (form.controls.courseId.touched && form.controls.courseId.invalid){
-            <small class="text-danger">Course ID is required</small>
-        }
-    </div>
+        <!-- Student Full Name -->
+        <div class="mb-3">
+          <label for="studentName" class="form-label fw-semibold">Student Full Name</label>
+          <input
+            id="studentName"
+            type="text"
+            formControlName="studentName"
+            class="form-control"
+            placeholder="e.g. Liya Kebede"
+          />
+          @if (form.controls.studentName.touched && form.controls.studentName.invalid) {
+            <small class="text-danger">Student name is required</small>
+          }
+        </div>
 
-    <div class="form-group mb-3">
-        <label for ="term">Term</label>
-        <input
+        <!-- Student ID (STU-1001) -->
+        <div class="mb-3">
+          <label for="studentId" class="form-label fw-semibold">Student ID</label>
+          <input
+            id="studentId"
+            type="text"
+            formControlName="studentId"
+            class="form-control"
+            placeholder="Format: STU-1001"
+          />
+          @if (form.controls.studentId.touched && form.controls.studentId.invalid) {
+            <small class="text-danger">Enter a valid Student ID (format: STU-1001 or STU1001)</small>
+          }
+        </div>
+
+        <!-- Course Select Dropdown -->
+        <div class="mb-3">
+          <label for="courseId" class="form-label fw-semibold">Primary Course Selection</label>
+          <select id="courseId" formControlName="courseId" class="form-select">
+            @for (c of coursesList; track c.id) {
+              <option [value]="c.id">{{ c.title }}</option>
+            }
+          </select>
+          @if (form.controls.courseId.touched && form.controls.courseId.invalid) {
+            <small class="text-danger">Primary course selection is required</small>
+          }
+        </div>
+
+        <!-- Academic Term -->
+        <div class="mb-3">
+          <label for="term" class="form-label fw-semibold">Academic Term</label>
+          <input
             id="term"
             type="text"
             formControlName="term"
             class="form-control"
-        />
+          />
         </div>
-       <div class="form-group mb-3">
-        <label for="notes">Notes (optional)</label>
-        <textarea
+
+        <!-- Notes -->
+        <div class="mb-4">
+          <label for="notes" class="form-label fw-semibold">Notes / Special Requests (Optional)</label>
+          <textarea
             id="notes"
+            rows="3"
             formControlName="notes"
-            class="form-control">
-        </textarea>
-
-       </div>
-
-       <div class="mb-3">
-        <h3>Backup Courses</h3>
-        <div formArrayName="backupCourses">
-            @for(backup of backups.controls; track $index){
-                <div class="d-flex mb-2 align-items-center">
-                    <input
-                    [formControlName]="$index"
-                    class="form-control me-2"
-                    placeholder="Backup Course Code"
-                    />
-                <button
-                type="button"
-                class="btn btn-danger btn-sm"
-                (click)="removeBackup($index)">
-                    Remove
-                </button>
-                </div>
-                @if (backup.touched && backup.invalid) {
-         <small class="text-danger d-block mb-2">Backup course code is required.</small>
-  }
-
-            }
+            class="form-control"
+            placeholder="Specify prerequisite waivers, morning/evening lab preferences...">
+          </textarea>
         </div>
-        <button
-        type="button"
-        class="btn btn-secondary btn-sm mt-2"
-        (click)="addBackup()">
-            Add Backup Course
+
+        <!-- Backup Courses Section -->
+        <div class="mb-4 pt-3 border-top border-secondary border-opacity-25">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h3 class="h6 mb-0">Alternate / Backup Courses</h3>
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-primary"
+              (click)="addBackup()">
+              + Add Backup Course
+            </button>
+          </div>
+
+          <div formArrayName="backupCourses">
+            @for (backup of backups.controls; track $index) {
+              <div class="d-flex mb-2 align-items-center gap-2">
+                <input
+                  [formControlName]="$index"
+                  class="form-control form-control-sm"
+                  placeholder="Backup Course Code (e.g. CSE-305)"
+                />
+                <button
+                  type="button"
+                  class="btn btn-outline-danger btn-sm text-nowrap"
+                  (click)="removeBackup($index)">
+                  Remove
+                </button>
+              </div>
+              @if (backup.touched && backup.invalid) {
+                <small class="text-danger d-block mb-2">Backup course code is required.</small>
+              }
+            }
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn-tms-primary w-full py-2 fs-6 fw-bold">
+          Confirm & Submit Application →
         </button>
-       </div>
-
-       <button type="submit" class="btn btn-primary">Confirm Enrollment</button> 
-       </form>
-        
-    
-}
-
-
-
+      </form>
+    </div>
+  }
+</div>
