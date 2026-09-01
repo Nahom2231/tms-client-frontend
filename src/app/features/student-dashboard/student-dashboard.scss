@@ -1,0 +1,20 @@
+.profile-banner {
+  background: linear-gradient(135deg, var(--bg-card), var(--bg-card-hover));
+  border: 1px solid var(--border-color);
+}
+
+.avatar-circle {
+  font-size: 2.2rem;
+  width: 54px;
+  height: 54px;
+  background: var(--primary-light);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-color);
+}
+
+.category-pills::-webkit-scrollbar {
+  display: none;
+}

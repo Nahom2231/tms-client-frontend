@@ -1,41 +1,101 @@
-<h2>Course Catalog</h2>
+<div class="container py-2">
+  
+  <!-- Success Notification Banner -->
+  @if (enrollmentToast(); as msg) {
+    <div class="alert alert-success alert-dismissible fade show mb-4 d-flex align-items-center gap-2 shadow-sm" role="alert">
+      <span>🎉</span>
+      <div>{{ msg }}</div>
+    </div>
+  }
 
-@if (availableCourses().length ===0){
-    <p> No courses are available this term. Check back during registration.</p>
+  <!-- Student Overview Profile Banner -->
+  <div class="tms-card profile-banner mb-4 p-4 position-relative overflow-hidden">
+    <div class="row align-items-center g-3">
+      <div class="col-12 col-md-7">
+        <div class="d-flex align-items-center gap-3">
+          <div class="avatar-circle">🎓</div>
+          <div>
+            <div class="d-flex align-items-center gap-2">
+              <h1 class="h3 mb-0">{{ studentName() }}</h1>
+              <span class="tms-badge badge-info">{{ studentId() }}</span>
+            </div>
+            <p class="text-muted mb-0 small mt-1">B.Sc. Computer Science & Engineering | Year 3</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-12 col-md-5">
+        <div class="grad-box p-3 border rounded-3 bg-card-hover">
+          <div class="d-flex justify-content-between align-items-center small mb-1">
+            <span class="text-muted">Degree Progress</span>
+            <span class="fw-bold">{{ earnedCredits() }} / {{ totalRequiredCredits }} Credits</span>
+          </div>
+          <div class="progress mb-2" style="height: 8px;">
+            <div class="progress-bar bg-success" role="progressbar" [style.width.%]="graduationPercentage()"></div>
+          </div>
+          <div class="d-flex justify-content-between align-items-center small">
+            <span class="tms-badge badge-approved" style="font-size: 0.65rem;">{{ graduationStatus() }}</span>
+            <span class="text-muted" style="font-size: 0.72rem;">75 Credits Remaining</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-}@else {
-    <div class ="course-grid">
-        @for (course of availableCourses(); track course.id){
-            <tms-course-card
+  <!-- Catalog Controls: Search and Filter Tabs -->
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-stretch align-items-md-center gap-3 mb-4">
+    <div>
+      <h2 class="h4 mb-1">Course Catalog & Registration</h2>
+      <p class="text-muted small mb-0">Browse accredited training modules and enroll for the upcoming term</p>
+    </div>
+
+    <!-- Search Input -->
+    <div class="search-box position-relative" style="min-width: 280px;">
+      <input 
+        type="text" 
+        [ngModel]="searchQuery()" 
+        (ngModelChange)="searchQuery.set($event)"
+        class="form-control form-control-sm ps-4 py-2" 
+        placeholder="🔍 Search course name, code, instructor..." />
+    </div>
+  </div>
+
+  <!-- Category Filter Pills -->
+  <div class="category-pills d-flex overflow-x-auto pb-2 mb-4 gap-2">
+    @for (cat of categories; track cat) {
+      <button 
+        (click)="selectedCategory.set(cat)" 
+        class="btn btn-sm text-nowrap rounded-pill px-3"
+        [class.btn-primary]="selectedCategory() === cat"
+        [class.btn-outline-secondary]="selectedCategory() !== cat">
+        {{ cat }}
+      </button>
+    }
+  </div>
+
+  <!-- Course Grid -->
+  @if (filteredCourses().length === 0) {
+    <div class="tms-card text-center py-5">
+      <p class="text-muted mb-0">No courses match your search filter "{{ searchQuery() }}".</p>
+    </div>
+  } @else {
+    <div class="row g-4">
+      @for (course of filteredCourses(); track course.id) {
+        <div class="col-12 col-md-6 col-lg-4">
+          <tms-course-card
             [course]="course"
             (enrollClicked)="handleEnroll($event)">
-        </tms-course-card>
-        }@empty{
-            <p> No results match your search</p>
-        }
-    </div>
-}
-  @if (selectedCourse(); as picked){
-    <p class = "selection-hint">
-        Last enrollment request: {{picked.title }} ({{ picked.code}})
-    </p>
-  }
-  @if (coursesResource.isLoading()){
-    <p> Loading courses...</p>
-  } @else if (coursesResource.value(); as courses){
-    @if(courses.length===0){
-        <p>No courses are available this term. Check back duriing registration.</p>
-
-    } @else {
-        <div class="course-grid">
-            @for (course of courses; track course.id){
-                <tms-course-card
-                [course]="course"
-                (enrollClicked)="handleEnroll($event)">
-            </tms-course-card>
-            }@empty{
-                <p> No results match your search</p>
-            }
+          </tms-course-card>
         </div>
-    }
+      }
+    </div>
   }
+
+  <!-- Last Selected Hint -->
+  @if (selectedCourse(); as picked) {
+    <div class="alert alert-info mt-4 d-flex justify-content-between align-items-center">
+      <span>Last enrollment request: <strong>{{ picked.title }}</strong> ({{ picked.code }})</span>
+      <button (click)="selectedCourse.set(null)" class="btn-close"></button>
+    </div>
+  }
+</div>
