@@ -1,49 +1,121 @@
-<div class ="max-w-md mx-auto mt-8 p-4">
-    <mat-card class="p-6">
-    <mat-card-header class ="mb-4">
-    <mat-card-title>Grade Submission Form </mat-card-title>
-    <mat-card-subtitle>Instructor Midterm Grading</mat-card-subtitle>
-    </mat-card-header>
-    <mat-card-content>
-        <form [formGroup]="gradeForm" (ngSubmit)="onSubmit()" class = "flex flex-col gap-4">
+<div class="container py-2" style="max-width: 900px;">
+  
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="h3 mb-1">📝 Midterm & Final Grade Entry</h1>
+      <p class="text-muted small mb-0">Record official academic scores and calculate grade letters for enrolled students</p>
+    </div>
+    <a routerLink="/instructor" class="btn-tms-outline btn-sm">← Back to Command Center</a>
+  </div>
 
-        <mat-form-field appearance="outline" class="w-full">
-        <mat-label>Student ID </mat-label>
-        <input matInput type="number" formControlName="studentId" />
-        @if (gradeForm.controls.studentId.hasError('required')){
-            <mat-error>Student ID is required </mat-error>
-        }
-        </mat-form-field>
-        <mat-form-field appearance="outline" class="w-full">
-            <mat-label>Course ID </mat-label>
-            <input matInput type="number" formControlName="courseId" />
-            @if (gradeForm.controls.courseId.hasError('required')) {
-            <mat-error>Course ID is required </mat-error>
-            }
-        </mat-form-field>
-        <mat-form-field appearance="outline" class="w-full">
-            <mat-label>Score (0-100) </mat-label>
-            <input matInput type="number" formControlName="score" />
-            @if(gradeForm.controls.score.hasError('min')|| gradeForm.controls.score.hasError('max')){
-                <mat-error>Score must be between 0 and 100 </mat-error>
-            }
-        </mat-form-field>
+  <div class="row g-4">
+    
+    <!-- Left Column: Form -->
+    <div class="col-12 col-md-6">
+      <div class="tms-card p-4">
+        <h2 class="h5 mb-4">Grade Entry Form</h2>
 
-        <div class="flex items-center gap-3 my-2 min-h-[40px]">
-        @if (isSubmitting) {
-            <mat-spinner diameter="24"></mat-spinner>
-        }
-        @if (submissionStatus) {
-        <span class="text-sm front-medium text-slate-700">{{submissionStatus }}</span>
-        }
-        </div>
-        <button
-        mat-raised-button
-        color="primary"
-        type="submit"
-        [disabled]="gradeForm.invalid|| isSubmitting"
-        class="w-full py-2">Submit Final Grade </button>
+        <form [formGroup]="gradeForm" (ngSubmit)="onSubmit()">
+          
+          <!-- Select Student -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Select Student</label>
+            <select formControlName="studentId" class="form-select">
+              @for (s of studentsList; track s.id) {
+                <option [value]="s.id">{{ s.name }} (ID: {{ s.id }})</option>
+              }
+            </select>
+          </div>
+
+          <!-- Select Course -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Select Course Module</label>
+            <select formControlName="courseId" class="form-select">
+              @for (c of coursesList; track c.id) {
+                <option [value]="c.id">{{ c.title }}</option>
+              }
+            </select>
+          </div>
+
+          <!-- Score Input + Auto Calculated Grade Letter -->
+          <div class="row g-2 mb-3">
+            <div class="col-8">
+              <label class="form-label fw-semibold">Numerical Score (0-100)</label>
+              <input type="number" formControlName="score" class="form-control" min="0" max="100" />
+            </div>
+            <div class="col-4 text-center">
+              <label class="form-label fw-semibold">Grade</label>
+              <div class="p-2 border rounded-3 fw-bold fs-5 text-white" 
+                [class.bg-success]="calculatedLetter().includes('A')"
+                [class.bg-primary]="calculatedLetter().includes('B')"
+                [class.bg-warning]="calculatedLetter().includes('C')"
+                [class.bg-danger]="calculatedLetter().includes('F') || calculatedLetter().includes('D')">
+                {{ calculatedLetter() }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Comments -->
+          <div class="mb-4">
+            <label class="form-label fw-semibold">Instructor Comments</label>
+            <input type="text" formControlName="comments" class="form-control" placeholder="Lab performance, attendance notes..." />
+          </div>
+
+          @if (submissionStatus) {
+            <div class="alert alert-info py-2 px-3 small mb-3">
+              {{ submissionStatus }}
+            </div>
+          }
+
+          <button
+            type="submit"
+            [disabled]="gradeForm.invalid || isSubmitting"
+            class="btn-tms-primary w-full py-2 fw-bold">
+            {{ isSubmitting ? 'Saving Grade...' : 'Submit Official Grade →' }}
+          </button>
         </form>
-    </mat-card-content>
-    </mat-card>
+      </div>
+    </div>
+
+    <!-- Right Column: Recent Grades Log -->
+    <div class="col-12 col-md-6">
+      <div class="tms-card p-4">
+        <h2 class="h5 mb-4">📋 Recent Submitted Grades Log</h2>
+
+        <div class="table-responsive">
+          <table class="table table-sm align-middle mb-0" style="color: var(--text-main);">
+            <thead>
+              <tr class="text-muted small border-bottom border-secondary border-opacity-25">
+                <th>STUDENT</th>
+                <th>GRADE</th>
+                <th>DATE</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (rec of recentGrades(); track rec.id) {
+                <tr class="border-bottom border-secondary border-opacity-10">
+                  <td>
+                    <div class="fw-semibold small">{{ rec.studentName || 'Student ID: ' + rec.studentId }}</div>
+                    <small class="text-muted" style="font-size: 0.72rem;">{{ rec.courseTitle || 'Course #' + rec.courseId }}</small>
+                  </td>
+                  <td>
+                    <span class="badge bg-primary px-2 py-1">{{ rec.score }}% ({{ rec.letterGrade || 'A' }})</span>
+                  </td>
+                  <td>
+                    <small class="text-muted" style="font-size: 0.72rem;">{{ rec.submittedAt }}</small>
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="3" class="text-center py-3 text-muted">No grade records submitted yet.</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
 </div>

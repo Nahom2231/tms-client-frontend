@@ -1,0 +1,11 @@
+.form-control, .form-select {
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  border-color: var(--border-color);
+}
+
+.form-control:focus, .form-select:focus {
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  border-color: var(--primary-color);
+}
