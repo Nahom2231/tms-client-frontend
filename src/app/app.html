@@ -1,1 +1,121 @@
-<router-outlet></router-outlet>
+<div class="app-layout">
+  <!-- Top Navigation Header -->
+  <header class="app-header">
+    <div class="container-fluid d-flex align-items-center justify-content-between px-4">
+      
+      <!-- Brand Logo -->
+      <a routerLink="/" class="brand-logo d-flex align-items-center gap-2 text-decoration-none">
+        <div class="logo-icon">🎓</div>
+        <div class="logo-text">
+          <span class="fw-bold fs-5 text-main">TMS</span>
+          <span class="badge bg-primary ms-2 small">Pro</span>
+        </div>
+      </a>
+
+      <!-- Main Navigation Links -->
+      <nav class="main-nav d-none d-md-flex align-items-center gap-1">
+        <a routerLink="/dashboard" routerLinkActive="active" class="nav-item">
+          📊 Student Dashboard
+        </a>
+        <a routerLink="/instructor" routerLinkActive="active" class="nav-item">
+          👨‍🏫 Instructor Center
+        </a>
+        <a routerLink="/enrollments" routerLinkActive="active" class="nav-item position-relative">
+          📋 Enrollments
+          @if (store.pendingCount() > 0) {
+            <span class="badge rounded-pill bg-warning text-dark ms-1">{{ store.pendingCount() }}</span>
+          }
+        </a>
+        <a routerLink="/grade-submission" routerLinkActive="active" class="nav-item">
+          📝 Grade Entry
+        </a>
+        @if (auth.hasRole('Admin')) {
+          <a routerLink="/admin/courses" routerLinkActive="active" class="nav-item">
+            ⚙️ Admin Panel
+          </a>
+        }
+        <a routerLink="/certificates" routerLinkActive="active" class="nav-item">
+          📜 Certificates
+        </a>
+      </nav>
+
+      <!-- Header Actions: Theme Toggle, Role Switcher, Profile -->
+      <div class="header-actions d-flex align-items-center gap-3">
+        
+        <!-- Live Sync SignalR Badge -->
+        <div class="sync-badge d-none d-lg-flex align-items-center gap-1" [title]="'SignalR State: ' + sync.connectionState()">
+          <span class="dot" [class.connected]="sync.connectionState() === 'connected'" [class.reconnecting]="sync.connectionState() === 'reconnecting'"></span>
+          <small class="text-muted text-uppercase" style="font-size: 0.7rem;">
+            {{ sync.connectionState() }}
+          </small>
+        </div>
+
+        <!-- Role Switcher -->
+        <div class="role-selector dropdown">
+          <select 
+            [value]="auth.currentUser()?.role" 
+            (change)="auth.switchRole($any($event.target).value)" 
+            class="form-select form-select-sm role-select"
+            title="Switch Simulated User Role">
+            <option value="Student">👤 Student View</option>
+            <option value="Instructor">👨‍🏫 Instructor View</option>
+            <option value="Admin">⚡ Admin View</option>
+          </select>
+        </div>
+
+        <!-- Dark / Light Mode Toggle Button -->
+        <button (click)="toggleTheme()" class="theme-toggle-btn" [title]="'Switch to ' + (theme.isDark() ? 'Light' : 'Dark') + ' Mode'">
+          @if (theme.isDark()) {
+            <span>☀️</span>
+          } @else {
+            <span>🌙</span>
+          }
+        </button>
+
+        <!-- User Profile Pill -->
+        <div class="user-pill d-none d-sm-flex align-items-center gap-2">
+          <img [src]="auth.currentUser()?.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + auth.currentUser()?.displayName" alt="User Avatar" class="user-avatar" />
+          <div class="user-info text-start d-none d-xl-block">
+            <div class="fw-semibold text-main lh-1" style="font-size: 0.85rem;">{{ auth.currentUser()?.displayName }}</div>
+            <small class="text-muted" style="font-size: 0.72rem;">{{ auth.currentUser()?.role }}</small>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Mobile Subnav bar for smaller screens -->
+  <div class="mobile-nav d-flex d-md-none overflow-x-auto py-2 px-3 gap-2 border-bottom border-secondary border-opacity-25">
+    <a routerLink="/dashboard" routerLinkActive="active" class="btn btn-sm btn-tms-outline py-1 px-2">Dashboard</a>
+    <a routerLink="/instructor" routerLinkActive="active" class="btn btn-sm btn-tms-outline py-1 px-2">Instructor</a>
+    <a routerLink="/enrollments" routerLinkActive="active" class="btn btn-sm btn-tms-outline py-1 px-2">Requests</a>
+    <a routerLink="/grade-submission" routerLinkActive="active" class="btn btn-sm btn-tms-outline py-1 px-2">Grades</a>
+    @if (auth.hasRole('Admin')) {
+      <a routerLink="/admin/courses" routerLinkActive="active" class="btn btn-sm btn-tms-outline py-1 px-2">Admin</a>
+    }
+    <a routerLink="/certificates" routerLinkActive="active" class="btn btn-sm btn-tms-outline py-1 px-2">Certificates</a>
+  </div>
+
+  <!-- Main View Container -->
+  <main class="main-content">
+    <router-outlet></router-outlet>
+  </main>
+
+  <!-- Footer -->
+  <footer class="app-footer text-center py-4 border-top">
+    <div class="container">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-2 text-muted small">
+        <div>
+          <strong>Training Management System (TMS)</strong> &copy; 2026. Built with Angular 20 & NgRx Signals.
+        </div>
+        <div class="d-flex gap-3">
+          <a routerLink="/dashboard" class="text-decoration-none text-muted">Catalog</a>
+          <a routerLink="/enroll" class="text-decoration-none text-muted">Enroll Form</a>
+          <a routerLink="/certificates" class="text-decoration-none text-muted">Certificates</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+</div>
