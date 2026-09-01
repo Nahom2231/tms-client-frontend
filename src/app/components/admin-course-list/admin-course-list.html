@@ -1,16 +1,140 @@
-<div class="admin-course-container">
-  <h2>Course Management</h2>
+<div class="container py-2">
+  
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-4">
+    <div>
+      <h1 class="h3 mb-1">⚙️ Admin Course & Curriculum Management</h1>
+      <p class="text-muted small mb-0">Create new course offerings, edit enrollment limits, and control department catalogs</p>
+    </div>
+    
+    @if (auth.hasRole('Admin')) {
+      <button (click)="openCreateModal()" class="btn-tms-primary btn-sm">
+        + Create New Course Module
+      </button>
+    }
+  </div>
 
-  @for (course of courses; track course.id) {
-    <div class="course-row">
-      <span>{{ course.title }}</span>
+  <!-- Search Header -->
+  <div class="tms-card p-3 mb-4">
+    <div class="row align-items-center">
+      <div class="col-12 col-md-6">
+        <input 
+          type="text" 
+          [ngModel]="searchFilter()" 
+          (ngModelChange)="searchFilter.set($event)"
+          class="form-control form-control-sm py-2" 
+          placeholder="🔍 Filter admin course records..." />
+      </div>
+      <div class="col-12 col-md-6 text-md-end mt-2 mt-md-0">
+        <span class="text-muted small">Total Active Offerings: <strong>{{ coursesList().length }}</strong></span>
+      </div>
+    </div>
+  </div>
 
-      <!-- Step 3: Conditional UI check -->
-      @if (auth.hasRole('Admin')) {
-        <button (click)="deleteCourse(course.id)" class="btn btn-danger">
-          Delete Course
-        </button>
-      }
+  <!-- Course Table -->
+  <div class="tms-card p-0 overflow-hidden shadow-sm">
+    <div class="table-responsive">
+      <table class="table align-middle mb-0" style="color: var(--text-main);">
+        <thead>
+          <tr class="text-muted small border-bottom border-secondary border-opacity-25">
+            <th>CODE</th>
+            <th>COURSE TITLE</th>
+            <th>CATEGORY</th>
+            <th>INSTRUCTOR</th>
+            <th>ENROLLED / CAPACITY</th>
+            <th class="text-end">ACTIONS</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (course of coursesList(); track course.id) {
+            <tr class="border-bottom border-secondary border-opacity-10">
+              <td>
+                <span class="tms-badge badge-info">{{ course.code }}</span>
+              </td>
+              <td>
+                <a [routerLink]="['/courses', course.id]" class="fw-bold text-main text-decoration-none">
+                  {{ course.title }}
+                </a>
+              </td>
+              <td>
+                <small class="text-muted">{{ course.category || 'General CS' }}</small>
+              </td>
+              <td>
+                <small class="text-muted">{{ course.instructor || 'Staff Instructor' }}</small>
+              </td>
+              <td>
+                <span class="fw-semibold">{{ course.enrollmentCount }} / {{ course.maxCapacity }} Seats</span>
+              </td>
+              <td class="text-end py-2">
+                @if (auth.hasRole('Admin')) {
+                  <button (click)="deleteCourse(course.id)" class="btn btn-sm btn-outline-danger">
+                    Delete Course
+                  </button>
+                } @else {
+                  <span class="text-muted small">Admin Privileges Required</span>
+                }
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="6" class="text-center py-4 text-muted">No courses found matching filter criteria.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Create New Course Modal -->
+  @if (showCreateModal()) {
+    <div class="modal-backdrop fade show"></div>
+    <div class="modal d-block" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content tms-card p-4">
+          <div class="modal-header border-0 pb-0">
+            <h5 class="modal-title fw-bold">Create New Course Module</h5>
+            <button type="button" class="btn-close" (click)="closeCreateModal()"></button>
+          </div>
+          
+          <div class="modal-body py-3">
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Course Title</label>
+              <input type="text" [ngModel]="newTitle()" (ngModelChange)="newTitle.set($event)" class="form-control" placeholder="e.g. Microservice Distributed Tracing" />
+            </div>
+
+            <div class="row g-2 mb-3">
+              <div class="col-6">
+                <label class="form-label fw-semibold">Course Code</label>
+                <input type="text" [ngModel]="newCode()" (ngModelChange)="newCode.set($event)" class="form-control" placeholder="e.g. CSE-601" />
+              </div>
+              <div class="col-6">
+                <label class="form-label fw-semibold">Max Capacity Seats</label>
+                <input type="number" [ngModel]="newCapacity()" (ngModelChange)="newCapacity.set($event)" class="form-control" />
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Department Category</label>
+              <select [ngModel]="newCategory()" (ngModelChange)="newCategory.set($event)" class="form-select">
+                <option value="Software Engineering">Software Engineering</option>
+                <option value="Frontend Engineering">Frontend Engineering</option>
+                <option value="Data Engineering">Data Engineering</option>
+                <option value="Cybersecurity">Cybersecurity</option>
+                <option value="Cloud Computing">Cloud Computing</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Assigned Instructor</label>
+              <input type="text" [ngModel]="newInstructor()" (ngModelChange)="newInstructor.set($event)" class="form-control" />
+            </div>
+          </div>
+
+          <div class="modal-footer border-0 pt-0 d-flex justify-content-end gap-2">
+            <button type="button" class="btn-tms-outline btn-sm" (click)="closeCreateModal()">Cancel</button>
+            <button type="button" class="btn-tms-primary btn-sm" (click)="saveCourse()">Save & Publish Course</button>
+          </div>
+        </div>
+      </div>
     </div>
   }
 </div>
