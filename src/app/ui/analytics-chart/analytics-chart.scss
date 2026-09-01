@@ -1,0 +1,25 @@
+.analytics-container {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+}
+
+.chart-wrapper {
+  background: var(--bg-main);
+  border: 1px dashed var(--border-color);
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.bar-fill {
+  width: 100%;
+  max-width: 38px;
+  background: linear-gradient(180deg, var(--primary-color), var(--accent-color));
+  border-radius: 8px 8px 0 0;
+  transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+
+.bar-fill:hover {
+  filter: brightness(1.2);
+}

@@ -1,16 +1,56 @@
-<div class = "course-card" [class.closed]= "course().enrollmentCount >= course().maxCapacity">
-    <h3>
-        <a [routerLink]="['/courses', course().id]">{{ course().title }}</a>
-        ({{course().code}})
-    </h3>
-    <p>Enrolled {{ course().enrollmentCount }} of {{ course().maxCapacity }} seats </p>
-    <p class = "status">
-        {{ course().enrollmentCount >= course().maxCapacity? "Full" : "Accepting enrollments" }}
-    </p>
+<div class="tms-card course-card h-100 d-flex flex-column justify-content-between" [class.closed]="course().enrollmentCount >= course().maxCapacity">
+  <div>
+    <!-- Top Header Tags -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <span class="tms-badge badge-info">{{ course().code }}</span>
+      <span class="tms-badge" [class.badge-pending]="course().enrollmentCount >= course().maxCapacity" [class.badge-approved]="course().enrollmentCount < course().maxCapacity">
+        {{ course().enrollmentCount >= course().maxCapacity ? 'Full (Waitlist)' : 'Accepting Enrollments' }}
+      </span>
+    </div>
 
+    <!-- Course Title & Category -->
+    <h3 class="h5 card-title mb-2">
+      <a [routerLink]="['/courses', course().id]" class="text-decoration-none text-main hover-primary">
+        {{ course().title }}
+      </a>
+    </h3>
+    
+    @if (course().category) {
+      <p class="text-muted small mb-2">🏷️ {{ course().category }}</p>
+    }
+
+    @if (course().instructor) {
+      <p class="text-muted small mb-3">👨‍🏫 Instructor: <strong>{{ course().instructor }}</strong></p>
+    }
+
+    <!-- Capacity Meter -->
+    <div class="capacity-box mb-3">
+      <div class="d-flex justify-content-between small mb-1">
+        <span class="text-muted">Seats Filled</span>
+        <span class="fw-semibold">{{ course().enrollmentCount }} / {{ course().maxCapacity }}</span>
+      </div>
+      <div class="progress" style="height: 6px; background-color: var(--border-color);">
+        <div 
+          class="progress-bar" 
+          role="progressbar" 
+          [style.width.%]="getCapacityPercentage(course())"
+          [class.bg-danger]="course().enrollmentCount >= course().maxCapacity"
+          [class.bg-success]="course().enrollmentCount < course().maxCapacity">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Controls -->
+  <div class="pt-3 border-top border-secondary border-opacity-25 d-flex align-items-center justify-content-between">
+    <a [routerLink]="['/courses', course().id]" class="btn-tms-outline btn-sm">
+      Details
+    </a>
     <button
-    (click)="enrollClicked.emit(course())"
-    [disabled]="course().enrollmentCount>= course().maxCapacity">
-    Enroll
-</button>
+      (click)="enrollClicked.emit(course())"
+      [disabled]="course().enrollmentCount >= course().maxCapacity"
+      class="btn-tms-primary btn-sm">
+      {{ course().enrollmentCount >= course().maxCapacity ? 'Class Full' : 'Enroll Now →' }}
+    </button>
+  </div>
 </div>
