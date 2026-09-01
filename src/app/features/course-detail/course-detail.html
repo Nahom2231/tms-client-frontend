@@ -1,4 +1,142 @@
-<h2>Course Detail </h2>
-<p> Course ID: {{id() }} </p>
+<div class="container py-2">
+  
+  <div class="mb-3">
+    <a routerLink="/dashboard" class="text-decoration-none text-muted small">← Back to Course Catalog</a>
+  </div>
 
-<a routerLink="/">Back to Dashboard</a>
+  @if (enrolledSuccess()) {
+    <div class="alert alert-success d-flex align-items-center justify-content-between mb-4">
+      <div>
+        🎉 <strong>Enrollment Request Received!</strong> You have applied for {{ course()?.title }}. An instructor will review your application shortly.
+      </div>
+      <a routerLink="/enrollments" class="btn btn-sm btn-outline-success">View Status</a>
+    </div>
+  }
+
+  @if (course(); as c) {
+    <!-- Hero Header Card -->
+    <div class="tms-card hero-card mb-4 p-4 p-md-5 position-relative">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-start gap-3 mb-3">
+        <div>
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <span class="tms-badge badge-info fs-6">{{ c.code }}</span>
+            <span class="tms-badge badge-approved">{{ c.category || 'Computer Science' }}</span>
+          </div>
+          <h1 class="h2 mb-2">{{ c.title }}</h1>
+          <p class="text-muted lead fs-6 mb-0">{{ c.description || 'Enterprise accredited training module focused on hands-on practical skills.' }}</p>
+        </div>
+
+        <div class="text-md-end shrink-0">
+          <div class="h3 fw-bold text-primary mb-1">{{ c.credits || 4 }} Credits</div>
+          <div class="text-muted small">Tuition Included in Term</div>
+        </div>
+      </div>
+
+      <div class="row g-3 pt-3 border-top border-secondary border-opacity-25 mt-3">
+        <div class="col-6 col-md-3">
+          <small class="text-muted d-block">INSTRUCTOR</small>
+          <strong>{{ c.instructor || 'Dr. Marcus Vance' }}</strong>
+        </div>
+        <div class="col-6 col-md-3">
+          <small class="text-muted d-block">SCHEDULE</small>
+          <strong>Mon / Wed 10:00 - 11:30 AM</strong>
+        </div>
+        <div class="col-6 col-md-3">
+          <small class="text-muted d-block">LOCATION</small>
+          <strong>Lab 402 / Online Hybrid</strong>
+        </div>
+        <div class="col-6 col-md-3">
+          <small class="text-muted d-block">SEAT CAPACITY</small>
+          <strong>{{ c.enrollmentCount }} / {{ c.maxCapacity }} Seats Filled</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content Layout -->
+    <div class="row g-4">
+      
+      <!-- Left Column: Syllabus & Learning Objectives -->
+      <div class="col-12 col-lg-8">
+        
+        <!-- Syllabus Timeline -->
+        <div class="tms-card p-4 mb-4">
+          <h2 class="h4 mb-4">📚 Course Curriculum & Syllabus Timeline</h2>
+          
+          <div class="timeline">
+            @for (mod of syllabusModules; track mod.week) {
+              <div class="timeline-item pb-4 position-relative ps-4 border-start border-2 border-primary">
+                <div class="timeline-dot"></div>
+                <div class="d-flex align-items-center gap-2 mb-1">
+                  <span class="badge bg-primary px-2 py-1">{{ mod.week }}</span>
+                  <h3 class="h6 mb-0 text-main fw-bold">{{ mod.title }}</h3>
+                </div>
+                <ul class="text-muted small mb-0 mt-2 ps-3">
+                  @for (topic of mod.topics; track topic) {
+                    <li>{{ topic }}</li>
+                  }
+                </ul>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Prerequisites -->
+        <div class="tms-card p-4">
+          <h3 class="h5 mb-3">🛠️ Course Prerequisites</h3>
+          <ul class="text-muted mb-0">
+            <li>Completion of Object-Oriented Programming (CSE-100) or equivalent.</li>
+            <li>Basic understanding of REST APIs, Data Structures, and SQL.</li>
+            <li>Git version control CLI familiarity.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Right Column: Registration Card & Instructor Bio -->
+      <div class="col-12 col-lg-4">
+        
+        <!-- Registration Box -->
+        <div class="tms-card p-4 mb-4 text-center">
+          <h3 class="h5 mb-3">Registration Status</h3>
+          
+          <div class="mb-4">
+            <div class="d-flex justify-content-between small mb-1">
+              <span class="text-muted">Capacity Status</span>
+              <span class="fw-bold">{{ c.enrollmentCount }} / {{ c.maxCapacity }}</span>
+            </div>
+            <div class="progress" style="height: 10px;">
+              <div 
+                class="progress-bar bg-success" 
+                role="progressbar" 
+                [style.width.%]="(c.enrollmentCount / c.maxCapacity) * 100">
+              </div>
+            </div>
+          </div>
+
+          <button 
+            (click)="enroll()"
+            [disabled]="c.enrollmentCount >= c.maxCapacity || enrolledSuccess()"
+            class="btn-tms-primary w-full py-3 fs-6 fw-bold">
+            {{ enrolledSuccess() ? '✓ Enrolled' : (c.enrollmentCount >= c.maxCapacity ? 'Waitlist Only' : 'Submit Registration →') }}
+          </button>
+          
+          <p class="text-muted small mt-3 mb-0">Instant confirmation notification dispatched upon submission.</p>
+        </div>
+
+        <!-- Instructor Profile Card -->
+        <div class="tms-card p-4">
+          <h3 class="h5 mb-3">Instructor Profile</h3>
+          <div class="d-flex align-items-center gap-3 mb-3">
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80" alt="Instructor" class="rounded-circle" style="width: 54px; height: 54px; object-fit: cover;" />
+            <div>
+              <h4 class="h6 mb-0">{{ c.instructor || 'Dr. Marcus Vance' }}</h4>
+              <small class="text-muted">Associate Professor of Computer Science</small>
+            </div>
+          </div>
+          <p class="text-muted small mb-0">15+ years enterprise software design experience. Former Principal Architect at Global Cloud Systems.</p>
+        </div>
+
+      </div>
+
+    </div>
+  }
+</div>
