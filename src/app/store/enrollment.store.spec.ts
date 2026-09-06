@@ -15,11 +15,11 @@ describe('EnrollmentStore', () => {
 
     it('verifies enities and pendingCount computed signal', () => {
         store.seed([
-           {id: 1, studentId: 11, studentName: 'Abeba', courseId: 101, 
+           {Id: '1', id: '1', studentId: 11, studentName: 'Abeba', courseId: 101, 
            courseName: 'Intro to CS', status: 'Pending', enrolledAt: '2026-08-12T10:00:00Z' },
-           {id: 2, studentId: 12, studentName: 'Kebede', 
+           {Id: '2', id: '2', studentId: 12, studentName: 'Kebede', 
            courseId: 102, courseName: 'Data Structures', status: 'Approved', enrolledAt: '2026-08-12T10:05:00Z' },
-           {id: 3, studentId: 13, studentName: 'Sara', courseId: 103, 
+           {Id: '3', id: '3', studentId: 13, studentName: 'Sara', courseId: 103, 
         courseName: 'Algorithms', status: 'Pending', enrolledAt: '2026-08-12T10:10:00Z'},
         ]);
         expect(store.entities()).toHaveLength(3);

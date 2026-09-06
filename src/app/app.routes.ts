@@ -3,22 +3,43 @@ import { roleGuard } from './guards/role.guard';
 
 export const routes: Routes = [
   {
+    path: 'login',
+    title: 'Sign In | TMS',
+    loadComponent: () =>
+      import('./features/login/login').then(m => m.LoginComponent)
+  },
+  {
+    path: 'register',
+    title: 'Sign Up | TMS',
+    loadComponent: () =>
+      import('./features/register/register').then(m => m.RegisterComponent)
+  },
+  {
+    path: 'forgot-password',
+    title: 'Reset Password | TMS',
+    loadComponent: () =>
+      import('./features/forgot-password/forgot-password').then(m => m.ForgotPasswordComponent)
+  },
+  {
     path: 'dashboard',
     title: 'Student Dashboard | TMS',
     loadComponent: () =>
-      import('./features/student-dashboard/student-dashboard').then(m => m.StudentDashboard)
+      import('./features/student-dashboard/student-dashboard').then(m => m.StudentDashboard),
+    canActivate: [roleGuard(['Student', 'Admin'])]
   },
   {
     path: 'instructor',
     title: 'Instructor Dashboard | TMS',
     loadComponent: () =>
-      import('./features/instructor-dashboard/instructor-dashboard').then(m => m.InstructorDashboard)
+      import('./features/instructor-dashboard/instructor-dashboard').then(m => m.InstructorDashboard),
+    canActivate: [roleGuard(['Instructor', 'Admin'])]
   },
   {
     path: 'enrollments',
     title: 'Enrollment Requests | TMS',
     loadComponent: () =>
-      import('./features/enrollment-list/enrollment-list').then(m => m.EnrollmentList)
+      import('./features/enrollment-list/enrollment-list').then(m => m.EnrollmentList),
+    canActivate: [roleGuard(['Admin', 'Instructor'])]
   },
   {
     path: 'courses/:id',
@@ -30,13 +51,15 @@ export const routes: Routes = [
     path: 'enroll',
     title: 'New Enrollment | TMS',
     loadComponent: () =>
-      import('./features/enrollment-form/enrollment-form').then(m => m.EnrollmentForm)
+      import('./features/enrollment-form/enrollment-form').then(m => m.EnrollmentForm),
+    canActivate: [roleGuard(['Student', 'Admin'])]
   },
   {
     path: 'grade-submission',
     title: 'Grade Submission | TMS',
     loadComponent: () =>
-      import('./features/grade-submission/grade-submission.component').then(m => m.GradeSubmissionComponent)
+      import('./features/grade-submission/grade-submission.component').then(m => m.GradeSubmissionComponent),
+    canActivate: [roleGuard(['Instructor', 'Admin'])]
   },
   {
     path: 'admin/courses',
@@ -49,7 +72,8 @@ export const routes: Routes = [
     path: 'certificates',
     title: 'My Certificates | TMS',
     loadComponent: () =>
-      import('./features/certificates/certificates').then(m => m.CertificatesComponent)
+      import('./features/certificates/certificates').then(m => m.CertificatesComponent),
+    canActivate: [roleGuard(['Student', 'Admin'])]
   },
   {
     path: 'unauthorized',
@@ -60,3 +84,4 @@ export const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
   { path: '**', redirectTo: 'dashboard' }
 ];
+

@@ -120,6 +120,13 @@
   padding: 1.5rem 0;
 }
 
+.main-content.auth-full-screen {
+  padding: 0 !important;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
 .app-footer {
   background-color: var(--bg-card);
   border-top: 1px solid var(--border-color);

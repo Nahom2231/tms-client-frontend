@@ -25,7 +25,19 @@ export class ThemeService {
       effect(() => {
         const theme = this.currentTheme();
         document.documentElement.setAttribute('data-theme', theme);
+        document.documentElement.setAttribute('data-bs-theme', theme);
         document.body.className = `${theme}-theme`;
+        if (theme === 'dark') {
+          document.documentElement.classList.add('dark-theme');
+          document.documentElement.classList.remove('light-theme');
+          document.body.classList.add('dark-theme');
+          document.body.classList.remove('light-theme');
+        } else {
+          document.documentElement.classList.add('light-theme');
+          document.documentElement.classList.remove('dark-theme');
+          document.body.classList.add('light-theme');
+          document.body.classList.remove('dark-theme');
+        }
         localStorage.setItem('tms-theme', theme);
       });
     }
